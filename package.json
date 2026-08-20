@@ -1,0 +1,122 @@
+{
+  "name": "markdown-natural-chinese-preview",
+  "displayName": "Markdown 自然中文预览",
+  "description": "Translate the official VS Code Markdown Preview into natural Simplified Chinese with Vercel AI Gateway.",
+  "version": "1.0.1",
+  "publisher": "dream-local",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onLanguage:markdown",
+    "onCommand:naturalChinesePreview.translate",
+    "onCommand:naturalChinesePreview.clear",
+    "onCommand:naturalChinesePreview.clearCache",
+    "onCommand:naturalChinesePreview.setApiKey",
+    "onCommand:naturalChinesePreview.selectModel"
+  ],
+  "main": "./dist/extension.js",
+  "files": [
+    "dist/extension.js",
+    "README.md",
+    "LICENSE.txt"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "naturalChinesePreview.translate",
+        "title": "将预览翻译成自然中文",
+        "category": "Markdown 自然中文预览",
+        "icon": "$(sparkle)"
+      },
+      {
+        "command": "naturalChinesePreview.clear",
+        "title": "恢复英文预览",
+        "category": "Markdown 自然中文预览",
+        "icon": "$(discard)"
+      },
+      {
+        "command": "naturalChinesePreview.selectModel",
+        "title": "选择 Vercel AI Gateway 模型",
+        "category": "Markdown 自然中文预览",
+        "icon": "$(server)"
+      },
+      {
+        "command": "naturalChinesePreview.setApiKey",
+        "title": "设置 Vercel AI Gateway Key",
+        "category": "Markdown 自然中文预览",
+        "icon": "$(key)"
+      },
+      {
+        "command": "naturalChinesePreview.clearCache",
+        "title": "清除本地翻译缓存",
+        "category": "Markdown 自然中文预览"
+      }
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "command": "naturalChinesePreview.translate",
+          "when": "activeWebviewPanelId == 'markdown.preview' || activeCustomEditorId == 'vscode.markdown.preview.editor'",
+          "group": "navigation@5"
+        },
+        {
+          "command": "naturalChinesePreview.clear",
+          "when": "activeWebviewPanelId == 'markdown.preview' || activeCustomEditorId == 'vscode.markdown.preview.editor'",
+          "group": "navigation@6"
+        },
+        {
+          "command": "naturalChinesePreview.selectModel",
+          "when": "activeWebviewPanelId == 'markdown.preview' || activeCustomEditorId == 'vscode.markdown.preview.editor'",
+          "group": "navigation@7"
+        }
+      ]
+    },
+    "markdown.markdownItPlugins": true,
+    "configuration": {
+      "title": "Markdown 自然中文预览",
+      "properties": {
+        "naturalChinesePreview.maxBatchCharacters": {
+          "type": "number",
+          "default": 6000,
+          "minimum": 1000,
+          "maximum": 20000,
+          "description": "每次发送给 Copilot 的最大源文本字符数。"
+        },
+        "naturalChinesePreview.translationStyle": {
+          "type": "string",
+          "default": "自然、流畅、符合现代简体中文表达习惯；避免逐字翻译和生硬欧化句式；准确保留原意，不扩写、不总结",
+          "description": "中文翻译风格要求。"
+        },
+        "naturalChinesePreview.requestTimeoutMs": {
+          "type": "number",
+          "default": 120000,
+          "minimum": 10000,
+          "maximum": 300000,
+          "description": "每批 Vercel AI Gateway 请求的超时时间（毫秒）。"
+        },
+        "naturalChinesePreview.cacheEnabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "在本机缓存完整译文，避免相同文件、模型和翻译风格重复计费。"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "build": "esbuild extension.js --bundle --platform=node --external:vscode --outfile=dist/extension.js",
+    "test": "node test.js",
+    "package": "npm run test && npm run build && vsce package"
+  },
+  "dependencies": {
+    "markdown-it": "^14.1.0"
+  },
+  "devDependencies": {
+    "@vscode/vsce": "^3.6.2",
+    "esbuild": "^0.25.9"
+  }
+}

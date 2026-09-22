@@ -85,7 +85,11 @@ function stripFrontMatter(source) {
 }
 
 function collectBlocks(source) {
-  const tokens = parser.parse(stripFrontMatter(source), {});
+  const rawSource = String(source || "");
+  const markdownSource = stripFrontMatter(rawSource);
+  const removedPrefix = rawSource.slice(0, rawSource.length - markdownSource.length);
+  const lineOffset = removedPrefix ? removedPrefix.split(/\r?\n/).length - 1 : 0;
+  const tokens = parser.parse(markdownSource, {});
   const blocks = [];
   for (const token of tokens) {
     if (!isTranslatableInline(token)) continue;
@@ -93,7 +97,9 @@ function collectBlocks(source) {
     blocks.push({
       id: `block-${blocks.length}`,
       sourceText: visible.text.trim(),
-      protectedInlines: visible.protectedInlines
+      protectedInlines: visible.protectedInlines,
+      startLine: Array.isArray(token.map) ? token.map[0] + lineOffset : undefined,
+      endLine: Array.isArray(token.map) ? token.map[1] + lineOffset : undefined
     });
   }
   return blocks;

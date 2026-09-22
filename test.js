@@ -47,6 +47,7 @@ async function run() {
     "Fast"
   ]);
   assert.strictEqual(blocks[1].protectedInlines.length, 5);
+  assert.deepStrictEqual(blocks.slice(0, 2).map((block) => [block.startLine, block.endLine]), [[3, 4], [5, 6]]);
   assert.strictEqual(createBatches(blocks, 1000).length, 1);
 
   const parsed = extractJsonArray("```json\n[{\"id\":\"block-0\",\"translation\":\"宁静的清晨\"}]\n```");

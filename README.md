@@ -5,9 +5,10 @@
 ## 使用方法
 
 1. 打开英文 `.md` 文件。
-2. 点击 VS Code 的“打开侧边预览”按钮。
-3. 在预览页点击闪光按钮“将预览翻译成自然中文”。
+2. 在预览页点击闪光按钮“将预览翻译成自然中文”。插件会打开中文预览；滚动时它会自动翻译新进入视口的段落，不会预先请求整篇文档。预览标题栏保留翻译、模型选择和恢复英文按钮。
 4. 首次使用时，在 VS Code 内输入 Vercel AI Gateway Key，并从实时模型列表中选择模型。
+
+也可以按 <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>Y</kbd>（macOS：<kbd>⌘</kbd>+<kbd>⌥</kbd>+<kbd>Y</kbd>）在中文和英文原文预览之间切换；预览标题栏也有相同按钮。
 
 ### 同事本地化部署（推荐）
 
@@ -29,7 +30,7 @@ AI_GATEWAY_API_KEY=你的Vercel AI Gateway Key
 - API Key 保存于 VS Code SecretStorage，不会写入 `settings.json`、项目文件或日志。
 - 模型列表从 `https://ai-gateway.vercel.sh/v1/models` 动态读取，不硬编码模型 ID。
 - 翻译调用 `https://ai-gateway.vercel.sh/v1/chat/completions`。
-- 完整译文默认缓存在本机，缓存键包含文件内容、模型和翻译风格，避免重复请求和费用。
+- 译文按段落缓存在本机，缓存键包含段落内容、模型和翻译风格；即使文件其他部分变化，已译段落也不会重复请求和计费。同一预览会话内上下滚动不会重复调用模型。
 - Markdown 内容会发送给所选模型，请勿翻译组织禁止发送到第三方服务的敏感文档。
 
 实现参考了 VS Code 官方 Markdown 扩展接口以及 MIT 许可的 Markdown Immersive Translate 的预览集成思路。

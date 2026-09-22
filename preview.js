@@ -12,7 +12,7 @@ function resourceKey(resource) {
 function setTranslations(resource, translations) {
   const key = resourceKey(resource);
   if (!key) return;
-  translationsByResource.set(key, translations);
+  translationsByResource.set(key, new Map((translations || []).map((translation) => [translation.id, translation])));
 }
 
 function clearTranslations(resource) {
@@ -22,6 +22,11 @@ function clearTranslations(resource) {
 
 function clearAllTranslations() {
   translationsByResource.clear();
+}
+
+function hasTranslations(resource) {
+  const key = resourceKey(resource);
+  return Boolean(key && translationsByResource.get(key)?.size);
 }
 
 function getEnvResource(env) {
@@ -64,7 +69,7 @@ function extendMarkdownIt(markdown) {
     const currentIndex = blockIndex;
     blockIndex += 1;
     const translations = translationsByResource.get(getEnvResource(env));
-    const expected = translations?.[currentIndex];
+    const expected = translations?.get(`block-${currentIndex}`);
     const visible = visibleInlineText(token);
     if (!expected || expected.id !== `block-${currentIndex}` || expected.sourceText !== visible.text.trim()) {
       return originalRenderInline(tokens, options, env);
@@ -79,6 +84,7 @@ module.exports = {
   setTranslations,
   clearTranslations,
   clearAllTranslations,
+  hasTranslations,
   extendMarkdownIt,
   renderTranslation
 };

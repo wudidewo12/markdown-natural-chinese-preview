@@ -157,14 +157,21 @@ async function requestTranslation(apiKey, modelId, batch, options) {
 
 async function translateBlocks(apiKey, modelId, blocks, options) {
   const batches = createBatches(blocks, options.maxBatchCharacters || 6000);
-  const translations = [];
-  for (let index = 0; index < batches.length; index += 1) {
-    if (options.token?.isCancellationRequested) throw new Error("操作已取消");
-    const batchTranslations = await requestTranslation(apiKey, modelId, batches[index], options);
-    translations.push(...batchTranslations);
-    await options.onProgress?.(index + 1, batches.length, translations.slice());
+  const results = new Array(batches.length);
+  const concurrency = Math.max(1, Math.min(Number(options.concurrency) || 1, batches.length));
+  let nextIndex = 0;
+  let completed = 0;
+  async function worker() {
+    while (nextIndex < batches.length) {
+      if (options.token?.isCancellationRequested) throw new Error("操作已取消");
+      const index = nextIndex++;
+      results[index] = await requestTranslation(apiKey, modelId, batches[index], options);
+      completed += 1;
+      await options.onProgress?.(completed, batches.length, results.flat());
+    }
   }
-  return translations;
+  await Promise.all(Array.from({ length: concurrency }, worker));
+  return results.flat();
 }
 
 module.exports = {
